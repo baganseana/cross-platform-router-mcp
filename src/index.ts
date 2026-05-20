@@ -165,24 +165,36 @@ export class CrossPlatformRouterMCP extends McpAgent<Env> {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    let path = url.pathname;
 
-    if (url.pathname === "/") {
-      return new Response("Cross-Platform Router MCP is running. Connect via /mcp", { status: 200 });
-    }
-
-    // Optional shared-secret guard. Only enforced if MCP_SHARED_SECRET is set.
+    // Lockdown: if MCP_SHARED_SECRET is set, it must be the first path segment.
+    // The full secret endpoint is therefore: https://<worker>/<SECRET>/mcp
+    // This works with any MCP client (no custom auth header needed) — the URL is the credential.
     if (env.MCP_SHARED_SECRET) {
-      const auth = request.headers.get("Authorization") ?? "";
-      if (auth !== `Bearer ${env.MCP_SHARED_SECRET}`) {
+      const prefix = `/${env.MCP_SHARED_SECRET}`;
+      if (path === prefix || path.startsWith(prefix + "/")) {
+        path = path.slice(prefix.length) || "/";
+      } else {
         return new Response("Unauthorized", { status: 401 });
       }
     }
 
-    if (url.pathname === "/sse" || url.pathname === "/sse/message") {
-      return CrossPlatformRouterMCP.serveSSE("/sse").fetch(request, env, ctx);
+    if (path === "/") {
+      return new Response("Cross-Platform Router MCP is running. Connect via the /mcp endpoint.", {
+        status: 200,
+      });
     }
-    if (url.pathname === "/mcp") {
-      return CrossPlatformRouterMCP.serve("/mcp").fetch(request, env, ctx);
+
+    // Rewrite the request URL to the stripped path so the MCP transport routing matches.
+    const innerUrl = new URL(request.url);
+    innerUrl.pathname = path;
+    const innerReq = new Request(innerUrl.toString(), request);
+
+    if (path === "/sse" || path === "/sse/message") {
+      return CrossPlatformRouterMCP.serveSSE("/sse").fetch(innerReq, env, ctx);
+    }
+    if (path === "/mcp") {
+      return CrossPlatformRouterMCP.serve("/mcp").fetch(innerReq, env, ctx);
     }
     return new Response("Not found", { status: 404 });
   },
