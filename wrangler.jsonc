@@ -18,6 +18,15 @@
       "new_sqlite_classes": ["CrossPlatformRouterMCP"]
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "MEMORY",
+      "id": "913accc636b24bcc98e69f409cdcdfc7"
+    }
+  ],
+  "triggers": {
+    "crons": ["0 9 * * *"]
+  },
   "observability": {
     "enabled": true
   }

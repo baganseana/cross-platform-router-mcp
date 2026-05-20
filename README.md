@@ -10,6 +10,21 @@ and Manus. Keys live as encrypted Worker secrets (never in code). Exposes four t
 | `ask_chatgpt` | OpenAI ChatGPT | catch-all / second opinion. Default `gpt-4o`. |
 | `manus_start_task` | Manus | starts an async task, returns `task_id` + `task_url`. |
 | `manus_check_task` | Manus | polls a task for its result. |
+| `get_memory` | — | returns the shared memory all engines use. |
+| `remember` | — | adds a durable fact/preference to shared memory. |
+
+## Shared memory
+
+A single memory document (stored in Workers KV) is **injected into every engine call**, so Gemini,
+ChatGPT, and Manus all share the same facts/preferences. Manage it three ways:
+
+- **`remember` tool** — from any Claude chat, "remember that …" appends a dated fact.
+- **`get_memory` tool** — read the current shared memory.
+- **`/admin/memory` endpoint** (secret-gated) — `GET` to pull, `PUT` to overwrite. Used by the
+  Claude Code skill's `sync_memory.py` to keep a local `MEMORY.md` and the server in sync.
+
+A **daily cron trigger** (`0 9 * * *`) asks Gemini to tidy/dedupe the memory and keeps a one-version
+backup at `memory:doc:prev`. Adjust the schedule in `wrangler.jsonc`.
 
 ---
 
