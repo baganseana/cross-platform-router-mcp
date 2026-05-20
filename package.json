@@ -1,0 +1,22 @@
+{
+  "name": "cross-platform-router-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remote MCP server that routes tasks to Gemini, ChatGPT, and Manus. Deployable to Cloudflare Workers for use with claude.ai web/mobile.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.23.0",
+    "agents": "^0.2.35",
+    "ai": "^5.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.0.0"
+  }
+}
