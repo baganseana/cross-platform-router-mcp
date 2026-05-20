@@ -18,6 +18,8 @@
       "new_sqlite_classes": ["CrossPlatformRouterMCP"]
     }
   ],
+  // Shared-memory store. Deploying your own copy? Run `npx wrangler kv namespace create MEMORY`
+  // and replace the id below with the one it prints (it must exist in YOUR Cloudflare account).
   "kv_namespaces": [
     {
       "binding": "MEMORY",

@@ -48,19 +48,23 @@ npm install
 # 1. Log into YOUR Cloudflare account (opens a browser; free account is fine)
 npx wrangler login
 
-# 2. Deploy once to create the Worker
+# 2. Create your own shared-memory KV store, then put its id in wrangler.jsonc
+npx wrangler kv namespace create MEMORY
+#    -> copy the printed id into the "kv_namespaces" id field in wrangler.jsonc
+
+# 3. Deploy to create the Worker
 npx wrangler deploy
 
-# 3. Add YOUR OWN API keys as encrypted secrets (paste each when prompted)
+# 4. Add YOUR OWN API keys as encrypted secrets (paste each when prompted)
 npx wrangler secret put GEMINI_API_KEY     # aistudio.google.com/apikey
 npx wrangler secret put OPENAI_API_KEY      # platform.openai.com/api-keys
 npx wrangler secret put MANUS_API_KEY       # open.manus.ai (Settings → API)
 
-# 4. Lock it down with a URL secret (STRONGLY recommended)
+# 5. Lock it down with a URL secret (STRONGLY recommended)
 openssl rand -hex 24                         # copy the output
 npx wrangler secret put MCP_SHARED_SECRET    # paste it when prompted
 
-# 5. Redeploy so the secret takes effect
+# 6. Redeploy so the secrets take effect
 npx wrangler deploy
 ```
 
